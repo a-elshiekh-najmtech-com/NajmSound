@@ -33,9 +33,11 @@ namespace NajmSound.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<AlbumViewModel>> GetAlbum(int id)
         {
-            var album = await _context.Albums.Include(x=>x.Artist)
-                .Select(x => _mapper.Map<AlbumViewModel>(x))
-                .FirstOrDefaultAsync(x=>x.Id==id);
+            var album = _mapper.Map<AlbumViewModel>(
+                await _context.Albums.Include(x => x.Artist)
+                .FirstOrDefaultAsync(x => x.Id == id)
+                );
+                
 
             if (album == null)
             {

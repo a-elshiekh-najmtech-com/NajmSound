@@ -37,9 +37,9 @@ namespace NajmSound.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<SongViewModel>> GetSong(int id)
         {
-            var song = await _context.Songs
-                .Select(x => _mapper.Map<SongViewModel>(x))
-                .FirstOrDefaultAsync(x => x.Id == id);
+            var song = _mapper.Map<SongViewModel>(
+                await _context.Songs
+                .FirstOrDefaultAsync(x => x.Id == id));
 
             if (song == null)
             {
