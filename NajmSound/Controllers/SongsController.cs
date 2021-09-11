@@ -48,6 +48,7 @@ namespace NajmSound.Controllers
 
             song.Artist = await _context.Artists.Where(x => x.Id == song.ArtistId).Select(x => x.Name).FirstOrDefaultAsync();
             song.Liked = await _context.LikedSongs.Where(x => x.SongId == song.Id && x.UserId == UserHelper.UserId).AnyAsync();
+            song.LikesCount = await _context.LikedSongs.CountAsync(x => x.SongId == id);
 
             return song;
         }
@@ -55,8 +56,9 @@ namespace NajmSound.Controllers
         [HttpPost("Like/{id}")]
         public async Task<ActionResult> LikeSong(int id)
         {
-            if (await _context.Songs.AnyAsync(x => x.Id == id))
+            if (!(await _context.Songs.AnyAsync(x => x.Id == id)))
                 return NotFound("Song Not Found!");
+
             if (await _context.LikedSongs.AnyAsync(x => x.SongId == id && x.UserId == UserHelper.UserId))
                 return BadRequest("Song Already on the Like List");
 
@@ -72,7 +74,7 @@ namespace NajmSound.Controllers
         [HttpPost("UnLike/{id}")]
         public async Task<ActionResult> UnLikeSong(int id)
         {
-            if (await _context.Songs.AnyAsync(x => x.Id == id))
+            if (!await _context.Songs.AnyAsync(x => x.Id == id))
                 return NotFound("Song Not Found!");
             var like = await _context.LikedSongs.FirstOrDefaultAsync(x => x.SongId == id && x.UserId == UserHelper.UserId);
             if (like == null)

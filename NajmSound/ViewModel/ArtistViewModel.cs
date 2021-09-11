@@ -26,6 +26,7 @@ namespace NajmSound.ViewModel
         public string Name { get; set; }
         public string Info { get; set; }
         public string InstgramUri { get; set; }
+        public bool liked { get; set; }
 
         public IEnumerable<SongListViewModel> Songs { get; set; }
         public IEnumerable<AlbumListViewModel> Albums { get; set; }

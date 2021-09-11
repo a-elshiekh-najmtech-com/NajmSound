@@ -34,7 +34,7 @@ namespace NajmSound.Controllers
         public async Task<ActionResult<AlbumViewModel>> GetAlbum(int id)
         {
             var album = _mapper.Map<AlbumViewModel>(
-                await _context.Albums.Include(x => x.Artist)
+                await _context.Albums.Include(x => x.Artist).Include(x=>x.Songs)
                 .FirstOrDefaultAsync(x => x.Id == id)
                 );
                 
@@ -49,7 +49,7 @@ namespace NajmSound.Controllers
             foreach (var item in album.Songs)
             {
                 item.Artist = album.Artist;
-                item.LikesCount = await _context.LikedSongs.Where(x => x.SongId == item.Id).CountAsync();
+                item.LikesCount = await _context.LikedSongs.CountAsync(x => x.SongId == item.Id);
                 item.Liked = await _context.LikedSongs.Where(x => x.SongId == item.Id && x.UserId == UserHelper.UserId).AnyAsync();
             }
 

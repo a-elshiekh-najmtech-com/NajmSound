@@ -61,10 +61,13 @@ namespace NajmSound.Controllers
                 return NotFound();
             }
 
+            artist.LikesCount =await _context.LikedArtists.Where(x => x.ArtistId == id).CountAsync();
+            artist.liked = await _context.LikedArtists.AnyAsync(x => x.ArtistId == id && x.UserId == UserHelper.UserId);
+
             foreach (var item in artist.Albums)
                 item.Artist = artist.Name;
             foreach (var item in artist.Songs)
-            { 
+            {
                 item.Artist = artist.Name;
                 item.LikesCount = await _context.LikedSongs.Where(x => x.SongId == item.Id).CountAsync();
                 item.Liked = await _context.LikedSongs.Where(x => x.SongId == item.Id && x.UserId == UserHelper.UserId).AnyAsync();
@@ -77,7 +80,7 @@ namespace NajmSound.Controllers
         [HttpPost("Like/{id}")]
         public async Task<ActionResult> LikeArtist(int id)
         {
-            if (await _context.Artists.AnyAsync(x => x.Id == id))
+            if (!(await _context.Artists.AnyAsync(x => x.Id == id)))
                 return NotFound("Artist Not Found!");
             if (await _context.LikedArtists.AnyAsync(x => x.ArtistId == id && x.UserId == UserHelper.UserId))
                 return BadRequest("Artist Already on the Like List");
@@ -94,7 +97,7 @@ namespace NajmSound.Controllers
         [HttpPost("UnLike/{id}")]
         public async Task<ActionResult> UnLikeArtist(int id)
         {
-            if (await _context.Artists.AnyAsync(x => x.Id == id))
+            if (!(await _context.Artists.AnyAsync(x => x.Id == id)))
                 return NotFound("Artist Not Found!");
             var like = await _context.LikedArtists.FirstOrDefaultAsync(x => x.ArtistId == id && x.UserId == UserHelper.UserId);
             if (like == null)
